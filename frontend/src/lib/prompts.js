@@ -56,7 +56,7 @@ export function buildScanContext(context) {
     if (sensitive.length) lines.push(`Sensitive subdomains: ${sensitive.map(s => s.subdomain).join(', ')}`);
   }
   if (tls) {
-    lines.push(`TLS: Grade ${tls.grade || 'N/A'} | Protocol: ${tls.protocol || 'unknown'} | Cipher: ${tls.cipher?.name || 'unknown'} | Expires in: ${tls.cert?.daysRemaining ?? 'N/A'} days | Self-signed: ${tls.cert?.selfSigned ? 'YES' : 'no'}`);
+    lines.push(`TLS: Grade ${tls.grade || 'N/A'} | Protocol: ${tls.protocol || 'unknown'} | Cipher: ${tls.cipher?.name || 'unknown'} | Expires in: ${tls.cert?.daysRemaining ?? 'N/A'} days | Certificate: ${tls.cert?.selfSigned ? 'SELF-SIGNED (untrusted)' : 'valid CA-signed (trusted)'}`);
   }
   if (http) {
     lines.push(`HTTP: HTTPS redirect: ${http.httpsRedirect ? 'yes' : 'NO'} | WAF: ${http.waf || 'none detected'} | Open redirect: ${http.openRedirect?.vulnerable ? 'VULNERABLE' : 'no'} | Server: ${http.server || 'hidden'} | Tech: ${http.techStack?.map(t => t.name).join(', ') || 'none detected'}`);
@@ -67,37 +67,18 @@ export function buildScanContext(context) {
   }
   if (ports) {
     const open = ports.open || [];
-    const openNums = new Set(open.map(p => p.port));
-
-    // All 27 ports that were probed
-    const ALL_SCANNED = [
-      [21,'FTP'],[22,'SSH'],[23,'Telnet'],[25,'SMTP'],[53,'DNS'],[80,'HTTP'],
-      [110,'POP3'],[143,'IMAP'],[443,'HTTPS'],[445,'SMB'],[587,'SMTP/TLS'],
-      [993,'IMAPS'],[995,'POP3S'],[1433,'MSSQL'],[2222,'SSH-alt'],[3000,'Dev/Node'],
-      [3306,'MySQL'],[3389,'RDP'],[4443,'HTTPS-alt'],[5432,'PostgreSQL'],[5900,'VNC'],
-      [6379,'Redis'],[8080,'HTTP-alt'],[8443,'HTTPS-alt'],[8888,'HTTP-alt'],
-      [9200,'Elasticsearch'],[27017,'MongoDB']
-    ];
-
     const openList = open.map(p => {
       let entry = `${p.port}/${p.service}`;
-      if (p.software && p.software !== p.service) entry += ` (${p.software}`;
-      else if (p.software) entry += ` (${p.software}`;
-      else entry += ' (';
-      if (p.version) entry += ` ${p.version}`;
-      if (p.poweredBy) entry += `, powered-by: ${p.poweredBy}`;
-      entry += ')';
-      if (p.httpStatus) entry += ` [HTTP ${p.httpStatus}]`;
-      return entry.replace(' ()', '');
+      if (p.software && p.software !== p.service) entry += ` (${p.software}${p.version ? ' ' + p.version : ''})`;
+      else if (p.version) entry += ` (${p.version})`;
+      if (p.httpStatus) entry += ` HTTP:${p.httpStatus}`;
+      return entry;
     }).join(', ');
-    const closedList = ALL_SCANNED.filter(([p]) => !openNums.has(p)).map(([p, s]) => `${p}/${s}`).join(', ');
 
-    lines.push(`Ports scanned: ${ports.total} total`);
-    lines.push(`OPEN ports: ${open.length > 0 ? openList : 'none'}`);
-    lines.push(`CLOSED/filtered ports: ${closedList}`);
+    lines.push(`Port scan: ${ports.total} ports checked. Only these are OPEN: ${open.length > 0 ? openList : 'none — all ports closed'}. All other ports are closed/filtered.`);
 
     const risky = open.filter(p => [21,23,445,1433,3306,3389,5432,5900,6379,9200,27017].includes(p.port));
-    if (risky.length) lines.push(`Risky open ports: ${risky.map(p => `${p.port}/${p.service}`).join(', ')}`);
+    if (risky.length) lines.push(`Dangerous open ports: ${risky.map(p => `${p.port}/${p.service}`).join(', ')}`);
   }
   if (risk?.findings?.length) {
     const top = risk.findings.slice(0, 5).map(f => `[${f.severity.toUpperCase()}] ${f.title}`);
