@@ -3,7 +3,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 function MarkdownText({ text }) {
   if (!text) return null;
-  const lines = text.split('\n');
+  // Merge bare number lines ("1.") with the following line
+  const rawLines = text.split('\n');
+  const lines = [];
+  for (let i = 0; i < rawLines.length; i++) {
+    if (rawLines[i].match(/^\d+\.?\s*$/) && i + 1 < rawLines.length && rawLines[i + 1].trim()) {
+      lines.push(rawLines[i].trim().replace(/\.?$/, '') + '. ' + rawLines[i + 1].trim());
+      i++;
+    } else {
+      lines.push(rawLines[i]);
+    }
+  }
   return (
     <div className="space-y-1">
       {lines.map((line, i) => {
