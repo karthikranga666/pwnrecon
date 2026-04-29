@@ -43,6 +43,8 @@ function MarkdownText({ text }) {
           });
           return <div key={i} className="flex items-start gap-1.5"><span style={{ color: '#4D9FFF' }} className="flex-shrink-0">{num}.</span><span>{restParts}</span></div>;
         }
+        // Skip bare number lines like "1." or "2." with no content
+        if (line.match(/^\d+\.?\s*$/)) return null;
         if (!line.trim()) return <div key={i} className="h-1" />;
         return <div key={i}>{rendered}</div>;
       })}

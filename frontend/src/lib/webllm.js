@@ -34,7 +34,7 @@ Rules:
 - Reference actual values: real subdomains, port numbers, grades, headers.
 - When asked "how to compromise" or "how to exploit": give numbered step-by-step attack steps using actual scan findings. Include specific tools and commands.
 - When asked "how to fix" or "how to remediate": give numbered step-by-step remediation steps. Be specific and actionable.
-- Format steps as: 1. ... 2. ... 3. ...
+- Format steps as: "1. text here" — number and text MUST be on the same line, never split across lines.
 - You CANNOT generate files, PDFs, or downloads. If asked for a PDF/report, say: "Use the EXPORT PDF button in the results view to download a full report."
 - Be technical and direct. Under 200 words.
 /no_think`;

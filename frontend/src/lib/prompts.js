@@ -109,15 +109,16 @@ export function buildScanContext(context) {
 
 export function buildChatPrompt(message, context) {
   const msg = message.toLowerCase();
-  const isCompromise = /comprom|exploit|attack|hack|pwn|bypass|inject|takeover|steal|gain access/i.test(msg);
+  const asksForSteps = /how (do|can|to|would)|step.by.step|walk me|show me how|give me steps|what steps/i.test(msg);
   const isNegated = /don.t|dont|not|without|if i (don|won)|what if i (don|won)|what happens/i.test(msg);
-  const isFix = !isNegated && /fix|remediat|harden|patch|mitigat|protect|secure|defend/i.test(msg);
+  const isCompromise = asksForSteps && !isNegated && /comprom|exploit|attack|hack|pwn|bypass|inject|takeover|gain access/i.test(msg);
+  const isFix = asksForSteps && !isNegated && /fix|remediat|harden|patch|mitigat|protect|secure|defend/i.test(msg);
 
-  let instruction = 'Answer directly using the scan data above. Reference actual findings, values, and domain names.';
+  let instruction = 'Answer the question directly and concisely using only the scan data above. Do not give steps or tutorials unless explicitly asked. Reference actual findings and values from the scan.';
   if (isCompromise) {
-    instruction = 'Give numbered step-by-step attack steps using the actual scan findings above. Include specific tools and commands for each step. Reference real ports, subdomains, and findings from the scan.';
+    instruction = 'Give numbered step-by-step attack steps using the actual scan findings above. Include specific tools and commands. Reference real ports, subdomains, and findings from the scan.';
   } else if (isFix) {
-    instruction = 'Give numbered step-by-step remediation steps for the findings above. Be specific — include config changes, commands, and tools needed for each step.';
+    instruction = 'Give numbered step-by-step remediation steps for the findings above. Include specific config changes and commands needed.';
   }
 
   return `Scan data for target:
