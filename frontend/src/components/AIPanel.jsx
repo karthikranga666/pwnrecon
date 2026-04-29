@@ -29,7 +29,19 @@ function MarkdownText({ text }) {
         }
         // Numbered list
         if (line.match(/^\d+\.\s/)) {
-          return <div key={i} className="flex items-start gap-1.5"><span style={{ color: '#4D9FFF' }}>{line.match(/^\d+/)[0]}.</span><span>{rendered}</span></div>;
+          const num = line.match(/^\d+/)[0];
+          const rest = line.replace(/^\d+\.\s*/, '');
+          const restParts = rest.split(/(`[^`]+`)/g).map((part, j) => {
+            if (part.startsWith('`') && part.endsWith('`')) {
+              return <code key={j} className="px-1 py-0.5 rounded text-xs" style={{ background: '#050709', color: '#00FF88', fontFamily: 'monospace' }}>{part.slice(1, -1)}</code>;
+            }
+            return part.split(/(\*\*[^*]+\*\*)/g).map((bp, k) =>
+              bp.startsWith('**') && bp.endsWith('**')
+                ? <strong key={k} style={{ color: '#E6EDF3' }}>{bp.slice(2, -2)}</strong>
+                : <span key={k}>{bp}</span>
+            );
+          });
+          return <div key={i} className="flex items-start gap-1.5"><span style={{ color: '#4D9FFF' }} className="flex-shrink-0">{num}.</span><span>{restParts}</span></div>;
         }
         if (!line.trim()) return <div key={i} className="h-1" />;
         return <div key={i}>{rendered}</div>;

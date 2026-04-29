@@ -110,7 +110,8 @@ export function buildScanContext(context) {
 export function buildChatPrompt(message, context) {
   const msg = message.toLowerCase();
   const isCompromise = /comprom|exploit|attack|hack|pwn|bypass|inject|takeover|steal|gain access/i.test(msg);
-  const isFix = /fix|remediat|harden|patch|mitigat|protect|secure|defend/i.test(msg);
+  const isNegated = /don.t|dont|not|without|if i (don|won)|what if i (don|won)|what happens/i.test(msg);
+  const isFix = !isNegated && /fix|remediat|harden|patch|mitigat|protect|secure|defend/i.test(msg);
 
   let instruction = 'Answer directly using the scan data above. Reference actual findings, values, and domain names.';
   if (isCompromise) {
