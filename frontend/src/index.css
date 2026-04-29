@@ -1,0 +1,150 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: #080B0F;
+  color: #E6EDF3;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Scrollable areas */
+.scrollable {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #1C2333 transparent;
+}
+
+.scrollable::-webkit-scrollbar {
+  width: 4px;
+}
+.scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollable::-webkit-scrollbar-thumb {
+  background: #1C2333;
+  border-radius: 2px;
+}
+
+/* Animated dot grid background */
+.grid-bg {
+  background-image: radial-gradient(circle, #1C2333 1px, transparent 1px);
+  background-size: 32px 32px;
+  animation: gridPulse 4s ease-in-out infinite;
+}
+
+/* CRT scanline overlay */
+.scanlines::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 2px,
+    rgba(0, 255, 136, 0.015) 2px,
+    rgba(0, 255, 136, 0.015) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Card hover glow */
+.card-green {
+  border: 1px solid #1C2333;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card-green:hover {
+  border-color: rgba(0, 255, 136, 0.4);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.08), inset 0 0 20px rgba(0, 255, 136, 0.03);
+}
+
+.card-red {
+  border: 1px solid #1C2333;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card-red:hover {
+  border-color: rgba(255, 68, 68, 0.4);
+  box-shadow: 0 0 20px rgba(255, 68, 68, 0.08), inset 0 0 20px rgba(255, 68, 68, 0.03);
+}
+
+.card-amber {
+  border: 1px solid #1C2333;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card-amber:hover {
+  border-color: rgba(255, 184, 0, 0.4);
+  box-shadow: 0 0 20px rgba(255, 184, 0, 0.08);
+}
+
+/* Neon text glow */
+.text-glow-green {
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.6), 0 0 20px rgba(0, 255, 136, 0.3);
+}
+.text-glow-red {
+  text-shadow: 0 0 10px rgba(255, 68, 68, 0.6);
+}
+
+/* Input glow on focus */
+.input-glow:focus {
+  box-shadow: 0 0 0 1px #00FF88, 0 0 20px rgba(0, 255, 136, 0.2);
+  outline: none;
+}
+
+/* Sweep scan line animation */
+@keyframes sweep {
+  0% { left: -10%; width: 10%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { left: 110%; width: 10%; opacity: 0; }
+}
+
+.sweep-line {
+  animation: sweep 2.5s ease-in-out infinite;
+}
+
+/* Count-up number styling */
+.count-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Typewriter cursor */
+.typewriter::after {
+  content: '|';
+  animation: blink 1s step-end infinite;
+  color: #00FF88;
+}
+
+@keyframes gridPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.55; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Severity badge colors */
+.badge-critical { background: rgba(255, 68, 68, 0.15); color: #FF4444; border: 1px solid rgba(255, 68, 68, 0.3); }
+.badge-high { background: rgba(255, 100, 50, 0.15); color: #FF6432; border: 1px solid rgba(255, 100, 50, 0.3); }
+.badge-medium { background: rgba(255, 184, 0, 0.15); color: #FFB800; border: 1px solid rgba(255, 184, 0, 0.3); }
+.badge-low { background: rgba(77, 159, 255, 0.15); color: #4D9FFF; border: 1px solid rgba(77, 159, 255, 0.3); }
+.badge-info { background: rgba(125, 133, 144, 0.15); color: #7D8590; border: 1px solid rgba(125, 133, 144, 0.3); }
+.badge-pass { background: rgba(0, 255, 136, 0.12); color: #00FF88; border: 1px solid rgba(0, 255, 136, 0.3); }
+.badge-warn { background: rgba(255, 184, 0, 0.12); color: #FFB800; border: 1px solid rgba(255, 184, 0, 0.3); }
+.badge-fail { background: rgba(255, 68, 68, 0.12); color: #FF4444; border: 1px solid rgba(255, 68, 68, 0.3); }
