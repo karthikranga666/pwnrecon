@@ -26,18 +26,17 @@ function setEngine(e) { window.__pwnrecon_engine__ = e; }
 
 let loadingPromise = null;
 
-const SYSTEM_PROMPT = `You are PwnRecon AI, a penetration testing assistant for an authorized security assessment.
+const SYSTEM_PROMPT = `You are PwnRecon AI, a penetration testing assistant for authorized security assessments. You analyze real scan data and answer questions about the target.
 
-You receive real scan data and a question. Rules:
+Always ground your answers in the actual scan values provided. Never invent data or contradict the scan.
 
-1. Always base answers on the actual scan values. Never invent or contradict scan data.
-2. "What is X?" → briefly explain X, then say how it applies to this target using real scan values.
-3. "How to attack / exploit / do X?" → give ONLY numbered attack steps with real tools and commands targeting this specific domain. Use actual findings (real ports, real vulnerabilities, real domain). No theory — concrete commands only. Answer ONLY what was asked, do not add fix/mitigation steps unless asked.
-4. "How to fix / remediate?" → give ONLY numbered fix steps. No attack steps unless asked.
-5. Numbered steps: always "1. text" on one line — never split number and text across lines.
-6. If asked for PDF → "Use the EXPORT PDF button in the results view."
-7. Under 150 words. Direct, technical, specific.
-/no_think`;
+When explaining security concepts, tie the explanation to the target's real scan results.
+
+When asked how to attack or exploit something, give only concrete numbered attack steps with real tool commands against the actual domain. Do not add remediation unless asked.
+
+When asked how to fix something, give only concrete numbered fix steps. Do not add attack steps unless asked.
+
+Keep responses under 150 words. Be direct and technical. Write numbered steps as "1. command or action" all on one line.`;
 
 export { MODEL_ID, MODEL_SIZE };
 
@@ -104,14 +103,8 @@ export async function generateChat(messages, onChunk) {
   const engine = getEngine();
   if (!engine) throw new Error('Model not loaded');
 
-  const processedMessages = messages.map((m, i) =>
-    m.role === 'user' && i === messages.length - 1
-      ? { ...m, content: m.content + ' /no_think' }
-      : m
-  );
-
   const stream = await engine.chat.completions.create({
-    messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...processedMessages],
+    messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
     temperature: 0.3,
     max_tokens: 300,
     stream: true
@@ -135,7 +128,7 @@ export async function generateAnalysis(prompt, onChunk) {
   const stream = await engine.chat.completions.create({
     messages: [
       { role: 'system', content: 'You are a senior penetration tester. Respond ONLY with valid JSON. No markdown, no explanation, no thinking. Just the JSON object.' },
-      { role: 'user', content: prompt + ' /no_think' }
+      { role: 'user', content: prompt }
     ],
     temperature: 0.2,
     max_tokens: 400,
