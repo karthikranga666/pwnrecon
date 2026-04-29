@@ -1,9 +1,9 @@
-import { runDNS } from '../backend/src/modules/dns.js';
-import { runTLS } from '../backend/src/modules/tls.js';
-import { runHTTP } from '../backend/src/modules/http.js';
-import { runHeaders } from '../backend/src/modules/headers.js';
-import { runPorts } from '../backend/src/modules/ports.js';
-import { runRisk } from '../backend/src/modules/risk.js';
+import { runDNS } from '../../backend/src/modules/dns.js';
+import { runTLS } from '../../backend/src/modules/tls.js';
+import { runHTTP } from '../../backend/src/modules/http.js';
+import { runHeaders } from '../../backend/src/modules/headers.js';
+import { runPorts } from '../../backend/src/modules/ports.js';
+import { runRisk } from '../../backend/src/modules/risk.js';
 
 function validateDomain(domain) {
   if (!domain || typeof domain !== 'string') return false;
