@@ -107,18 +107,13 @@ export function buildScanContext(context) {
   return lines.join('\n');
 }
 
-export function buildChatPrompt(message, context) {
-  const msg = message.toLowerCase();
-  const asksForSteps = /how (do|can|to|would)|step.by.step|walk me|show me how|give me steps|what steps/i.test(msg);
-  const isNegated = /don.t|dont|not|without|if i (don|won)|what if i (don|won)|what happens/i.test(msg);
-  const isCompromise = asksForSteps && !isNegated && /comprom|exploit|attack|hack|pwn|bypass|inject|takeover|gain access/i.test(msg);
-  const isFix = asksForSteps && !isNegated && /fix|remediat|harden|patch|mitigat|protect|secure|defend/i.test(msg);
+const GENERAL_QUESTION = /^what (is|are|does|do)|^explain|^define|^how does|^tell me about|^describe/i;
 
-  let instruction = 'Answer the question directly and concisely using only the scan data above. Do not give steps or tutorials unless explicitly asked. Reference actual findings and values from the scan.';
-  if (isCompromise) {
-    instruction = 'Give numbered step-by-step attack steps using the actual scan findings above. Include specific tools and commands. Reference real ports, subdomains, and findings from the scan.';
-  } else if (isFix) {
-    instruction = 'Give numbered step-by-step remediation steps for the findings above. Include specific config changes and commands needed.';
+export function buildChatPrompt(message, context) {
+  const isGeneral = GENERAL_QUESTION.test(message.trim()) && !/my|this site|the scan|the target|theaegis|finding|result/i.test(message);
+
+  if (isGeneral) {
+    return `User question: ${message}\n\nAnswer from your security knowledge. Be concise, under 100 words.`;
   }
 
   return `Scan data for target:
@@ -127,5 +122,5 @@ ${buildScanContext(context)}
 
 User question: ${message}
 
-${instruction} Under 200 words.`;
+Answer using the scan data above. Trust the scan values exactly — do not contradict them. Be direct and concise. Under 200 words.`;
 }
