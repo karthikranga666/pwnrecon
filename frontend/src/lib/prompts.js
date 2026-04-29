@@ -90,9 +90,29 @@ export function buildScanContext(context) {
 
 export function buildChatPrompt(message, context) {
   const scanContext = buildScanContext(context);
+  const { domain, modules, risk } = context?.scanData || {};
+
+  // Pull key facts to remind model what's real
+  const facts = [];
+  if (domain) facts.push(`Target domain: ${domain}`);
+  if (modules?.ports?.open?.length > 0)
+    facts.push(`Open ports: ${modules.ports.open.map(p => `${p.port}/${p.service}`).join(', ')}`);
+  if (modules?.ports?.open?.length === 0)
+    facts.push(`Open ports: none — all 27 ports closed`);
+  if (modules?.http?.httpsRedirect === false) facts.push(`No HTTPS redirect (HTTP port 80 unprotected)`);
+  if (modules?.http?.openRedirect?.vulnerable) facts.push(`Open redirect: VULNERABLE`);
+  if (modules?.tls?.grade) facts.push(`TLS grade: ${modules.tls.grade} (${modules.tls.protocol})`);
+  if (modules?.tls?.cert?.selfSigned === false) facts.push(`TLS certificate: CA-signed (not self-signed)`);
+  if (!modules?.dns?.emailSecurity?.spf?.present) facts.push(`SPF: missing`);
+  if (!modules?.dns?.emailSecurity?.dmarc?.present) facts.push(`DMARC: missing`);
 
   return `Scan data:
 ${scanContext}
 
-Question: ${message}`;
+Confirmed facts about ${domain || 'this target'}:
+${facts.map(f => `- ${f}`).join('\n')}
+
+Question: ${message}
+
+Answer using ONLY the confirmed facts above. Reference the actual domain name and real values. Do not invent data.`;
 }
