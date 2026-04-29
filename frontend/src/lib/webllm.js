@@ -36,7 +36,7 @@ When asked how to attack or exploit something, give only concrete numbered attac
 
 When asked how to fix something, give only concrete numbered fix steps. Do not add attack steps unless asked.
 
-Keep responses under 150 words. Be direct and technical. Write numbered steps as "1. command or action" all on one line.`;
+Keep responses under 150 words. Be direct and technical. Write numbered steps as "1. command or action" all on one line. /no_think`;
 
 export { MODEL_ID, MODEL_SIZE };
 
