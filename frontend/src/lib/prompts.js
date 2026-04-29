@@ -107,20 +107,11 @@ export function buildScanContext(context) {
   return lines.join('\n');
 }
 
-const GENERAL_QUESTION = /^what (is|are|does|do)|^explain|^define|^how does|^tell me about|^describe/i;
-
 export function buildChatPrompt(message, context) {
-  const isGeneral = GENERAL_QUESTION.test(message.trim()) && !/my|this site|the scan|the target|theaegis|finding|result/i.test(message);
+  const scanContext = buildScanContext(context);
 
-  if (isGeneral) {
-    return `User question: ${message}\n\nAnswer from your security knowledge. Be concise, under 100 words.`;
-  }
+  return `Scan data:
+${scanContext}
 
-  return `Scan data for target:
-
-${buildScanContext(context)}
-
-User question: ${message}
-
-Answer using the scan data above. Trust the scan values exactly — do not contradict them. Be direct and concise. Under 200 words.`;
+Question: ${message}`;
 }
